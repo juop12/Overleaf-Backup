@@ -1,13 +1,3 @@
-
-# Open the PyCharm terminal (bottom panel) and run:
-#	pip install requests tqdm
-#
-# 💡 Small PyCharm tip:
-# If PyCharm complains about imports, make sure you're using the same 
-# interpreter where you installed the packages:
-#	File → Settings → Python Interpreter
-#
-
 import requests
 import os
 import zipfile
@@ -20,7 +10,20 @@ from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 
-SESSION_COOKIE = "your_overleaf_session2_cookie"
+def load_env(path=".env"):
+    if not os.path.exists(path):
+        return
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            os.environ.setdefault(key.strip(), value.strip())
+
+load_env()
+
+SESSION_COOKIE = os.getenv("OVERLEAF_SESSION_COOKIE", "your_overleaf_session2_cookie")
 
 BASE_URL = "https://www.overleaf.com"
 DOWNLOAD_DIR = "overleaf_backup"
@@ -30,8 +33,14 @@ REQUEST_TIMEOUT = 60
 
 def create_session(cookie):
 
-    if not cookie:
-        raise ValueError("Missing Overleaf cookie. Set SESSION_COOKIE in this file.")
+    if not cookie or cookie == "your_overleaf_session2_cookie":
+        raise ValueError(
+            "Missing Overleaf session cookie.\n"
+            "Set it in one of these ways:\n"
+            "  1. Create a .env file: OVERLEAF_SESSION_COOKIE=your_cookie\n"
+            "  2. Edit overleaf_backup.py: SESSION_COOKIE = 'your_cookie'\n"
+            "  3. Export environment variable: export OVERLEAF_SESSION_COOKIE=your_cookie"
+        )
 
     s = requests.Session()
     s.headers.update({

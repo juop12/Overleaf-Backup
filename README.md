@@ -42,16 +42,40 @@ This script automates downloading all your Overleaf projects as ZIP files, organ
    pip install -r requirements.txt
    ```
 
-4. **Add your Overleaf session cookie:**
+4. **Configure your Overleaf session cookie:**
 
-   - Open https://www.overleaf.com and log in
-   - Open Developer Tools (F12 or Ctrl+Shift+I)
-   - Go to **Application** → **Cookies** → https://www.overleaf.com
-   - Copy the value of the `overleaf_session2` cookie
+   **Option A: Using .env file (Recommended)**
+
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Open `.env` and paste your cookie value:
+     ```
+     OVERLEAF_SESSION_COOKIE=your_cookie_value_here
+     ```
+   - The script will automatically read from `.env`
+
+   **Option B: Direct in script**
+
    - Edit `overleaf_backup.py` and set:
      ```python
      SESSION_COOKIE = "your_cookie_value_here"
      ```
+
+   **Option C: Environment variable**
+
+   ```bash
+   export OVERLEAF_SESSION_COOKIE="your_cookie_value_here"
+   python3 overleaf_backup.py
+   ```
+
+   **How to get your cookie:**
+
+   - Open https://www.overleaf.com and log in
+   - Open Developer Tools (F12 or Ctrl+Shift+I)
+   - Go to **Application** → **Cookies** → https://www.overleaf.com
+   - Copy the value of `overleaf_session2`
 
 5. **Run the backup:**
 
@@ -99,6 +123,27 @@ Each backup includes a `backup_summary.json` file:
   "failed": []
 }
 ```
+
+## Environment Configuration (.env)
+
+The recommended way to store your session cookie is using a `.env` file:
+
+1. **Copy the example file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env` and add your cookie:**
+   ```
+   OVERLEAF_SESSION_COOKIE=s%3AyourActualCookieValueHere.moreCookieDataHere
+   ```
+
+3. **The script automatically reads from `.env`**
+
+The `.env` file is ignored by Git (see `.gitignore`), so your cookie won't be accidentally committed to version control.
+
+**Available environment variables:**
+- `OVERLEAF_SESSION_COOKIE` - Your Overleaf session token (required)
 
 ## Configuration
 
